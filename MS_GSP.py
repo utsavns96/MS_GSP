@@ -77,41 +77,48 @@ def sortdata(data,mis):
     '''
     temp = [] #temp variable to hold the MIS values that we need
     m=[] #final sorted items
-    sorteditems = []
     for itemset in data:
         for sequence in itemset:
-            #print("unsorted sequence: ",sequence)
             for item in sequence:
-                temp.append(mis[item])
-            #print("Sorting")
-            sortedsequence = [x for _,x in sorted(zip(temp,sequence))]
-            sorteditems.append(sortedsequence)
-            temp=[]
-        m.append(sorteditems)
-        sorteditems = []
-            #print("Sorted sequence: ",sequence)
-    #print("Sorted data:")
-    #print(m)
+                if(item not in m):
+                    m.append(item)
+                    temp.append(mis[item])
+    m = [x for _,x in sorted(zip(temp,m))]
     return m
 
 
-def init_pass(S):
+def init_pass(S,m,mis):
     '''
     Go through dataset "S" once to calculate support count of individual items.
     :param S:
+    :param m:
     :return: A dictionary with key being the item, value being count.
     '''
-    ret = {}
+    supportcounts = {}
+    L=[]
+    #Step 1: Scan through data and record support count
     for itemset in S:
         for sequence in itemset:
             for item in sequence:
-                if item in ret:
-                    ret[item] += 1
+                if item in supportcounts:
+                    supportcounts[item] += 1
                 else:
-                    ret[item] = 1
-    return ret
+                    supportcounts[item] = 1
+    #Step 2: follow sorted order to find the first item i in m that meets i.count/n >= MIS(i).
+    mis_i = 0
+    #find the first item i in M that meets MIS(i)
+    for i in m:
+        if(len(L)==0):
+            if(supportcounts[i]/len(data) >= mis[i]):
+                L.append(i)
+                mis_i = mis[i]
+        # For each subsequent item j in M after i, if j.count/n >= MIS(i), then j is also inserted into L
+        else:
+            if(supportcounts[i]/len(data) >= mis_i):
+                L.append(i)
+    return L,supportcounts
 
-def filter(C, mis, num_sequences):
+def filter(L, mis, supportcounts, num_sequences):
     '''
     Go through candidates "C", filter out those that fall below minsup for that item.
     F <- {<F> | for f in C, f.count >= minsup}
@@ -121,16 +128,16 @@ def filter(C, mis, num_sequences):
     :return:
     '''
     ret = {}
-    for candidate in C:
-        val = C[candidate]/num_sequences # f.count / n
-        if val >= mis[candidate]:
-            ret[candidate] = C[candidate]
-
+    for candidate in L:
+        #val = supportcounts[candidate]/num_sequences # f.count / n
+        if supportcounts[candidate]/num_sequences >= mis[candidate]:
+            ret[candidate] = supportcounts[candidate]
     return ret
 # GSP algorithm:
-def GSP(S, mis):
-    C = init_pass(S)
-    F = filter(C, mis, len(S))
+def GSP(S,m,mis):
+    L,supportcounts = init_pass(S,m,mis)
+    F = filter(L, mis, supportcounts, len(S))
+    print("F: ", F)
 
 if __name__ == "__main__":
     data = readdata()
@@ -144,4 +151,4 @@ if __name__ == "__main__":
     m = sortdata(data,mis)
     print("Sorted Data:\n",m)
     print("\n************\n")
-    GSP(m, mis)
+    GSP(data,m, mis)
