@@ -1,7 +1,8 @@
-from MS_GSP import readdata, readparam, init_pass
+from MS_GSP import readdata, readparam, init_pass, sortdata
 
 data = readdata()
 mis, sdc = readparam()
+m = sortdata(data, mis)
 
 
 def sup(item, data):
@@ -36,8 +37,13 @@ def level2_candidate_gen_SPM(L, phi, mis, num_sequences):
                     for sequence in data:
                         for sub_sequence in sequence:
                             if l in sub_sequence and h in sub_sequence:
-                                new_sequence = [item for item in sub_sequence if item in (l, h)]
-                                C2.add(tuple(new_sequence))
+                                l_index = sub_sequence.index(l)
+                                h_index = sub_sequence.index(h)
+                                if l_index < h_index:
+                                    new_sequence = [l,h]
+                                    C2.add(tuple(new_sequence))
+                                C2.add((l,))
+                                C2.add((h,))
     return C2
 
 
@@ -45,9 +51,5 @@ if __name__ == "__main__":
     for i in range(10, 100, 10):
         print("{}: {}".format(i, sup(i, data)))
 
-    L = init_pass(data)
+    L = init_pass(data, m, mis)
 
-    lvl2 = level2_candidate_gen(L, 0.1, mis, len(L))
-    lvl2_SPM = level2_candidate_gen_SPM(L, 0.1, mis, len(L))
-    print(len(lvl2))
-    print(len(lvl2_SPM))

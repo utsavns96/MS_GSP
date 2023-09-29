@@ -1,6 +1,7 @@
 #MS_GSP
 
 import re
+from candidate_gen import *
 
 def readdata():
     '''
@@ -140,12 +141,17 @@ def filter(L, mis, num_sequences):
 
 # GSP algorithm:
 def GSP(S,m,mis):
-    L= init_pass(S,m,mis)
+    L = init_pass(S,m,mis)
     print("L: ",L)
     print("\n************\n")
     F = filter(L, mis, len(S))
     print("F: ", F)
     print("\n************\n")
+    lvl2 = level2_candidate_gen(L, 0.1, mis, len(L))
+    lvl2_SPM = level2_candidate_gen_SPM(L, 0.1, mis, len(L))
+    print(len(lvl2))
+    print(len(lvl2_SPM))
+
 
 if __name__ == "__main__":
     data = readdata()
