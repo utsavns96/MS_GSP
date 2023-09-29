@@ -95,7 +95,8 @@ def init_pass(S,m,mis):
     :return: A dictionary with key being the item, value being count.
     '''
     supportcounts = {}
-    L=[]
+    #L=[]
+    L={}
     #Step 1: Scan through data and record support count
     for itemset in S:
         for sequence in itemset:
@@ -110,34 +111,41 @@ def init_pass(S,m,mis):
     for i in m:
         if(len(L)==0):
             if(supportcounts[i]/len(data) >= mis[i]):
-                L.append(i)
+                #L.append(i)
                 mis_i = mis[i]
+                L[i]=supportcounts[i]
         # For each subsequent item j in M after i, if j.count/n >= MIS(i), then j is also inserted into L
         else:
             if(supportcounts[i]/len(data) >= mis_i):
-                L.append(i)
-    return L,supportcounts
+                #L.append(i)
+                L[i]=supportcounts[i]
+    #return L,supportcounts
+    return L
 
-def filter(L, mis, supportcounts, num_sequences):
+def filter(L, mis, num_sequences):
     '''
     Go through candidates "C", filter out those that fall below minsup for that item.
     F <- {<F> | for f in C, f.count >= minsup}
-    :param C: Candidates from init_pass
+    :param L: Candidates from init_pass
     :param mis: list of minsups
     :num_sequences: number of sequences in S (len(S))
-    :return:
+    :return: A dictionary with key being the item, value being count.
     '''
     ret = {}
     for candidate in L:
         #val = supportcounts[candidate]/num_sequences # f.count / n
-        if supportcounts[candidate]/num_sequences >= mis[candidate]:
-            ret[candidate] = supportcounts[candidate]
+        if L[candidate]/num_sequences >= mis[candidate]:
+            ret[candidate] = L[candidate]
     return ret
+
 # GSP algorithm:
 def GSP(S,m,mis):
-    L,supportcounts = init_pass(S,m,mis)
-    F = filter(L, mis, supportcounts, len(S))
+    L= init_pass(S,m,mis)
+    print("L: ",L)
+    print("\n************\n")
+    F = filter(L, mis, len(S))
     print("F: ", F)
+    print("\n************\n")
 
 if __name__ == "__main__":
     data = readdata()
