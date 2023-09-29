@@ -3,6 +3,9 @@
 import re
 
 def readdata():
+    '''
+    Read input data file and format it as a list of lists
+    '''
     #print("Data:")
     data = [] #holds our formatted data
     lines = [] #holds lines of the input file
@@ -32,6 +35,17 @@ def readdata():
     return data
     
 def readparam():
+    '''
+    Read input parameters file and store
+
+    Returns
+    -------
+    mis : dictionary
+        dict with mis values stored at index values corresponding to item values.
+    sdc : float
+        sdc value.
+
+    '''
     mis = {} #holds our minsups
     temp = [] #temp list #1
     sdc = 0
@@ -53,6 +67,32 @@ def readparam():
             
     f.close()
     return mis,sdc
+
+def sortdata(data,mis):
+    '''
+    Go through the itemsets and sort the items based on their MIS values
+    :param data: list of raw data read from file
+    :param mis: mis values
+    :return: List of lists of sorted itemsets
+    '''
+    temp = [] #temp variable to hold the MIS values that we need
+    m=[] #final sorted items
+    sorteditems = []
+    for itemset in data:
+        for sequence in itemset:
+            #print("unsorted sequence: ",sequence)
+            for item in sequence:
+                temp.append(mis[item])
+            #print("Sorting")
+            sortedsequence = [x for _,x in sorted(zip(temp,sequence))]
+            sorteditems.append(sortedsequence)
+            temp=[]
+        m.append(sorteditems)
+        sorteditems = []
+            #print("Sorted sequence: ",sequence)
+    #print("Sorted data:")
+    #print(m)
+    return m
 
 
 def init_pass(S):
@@ -100,4 +140,8 @@ if __name__ == "__main__":
     print("MIS:\n",mis)
     print("\n************\n")
     print("SDC = ",sdc)
-    GSP(data, mis)
+    print("\n************\n")
+    m = sortdata(data,mis)
+    print("Sorted Data:\n",m)
+    print("\n************\n")
+    GSP(m, mis)
