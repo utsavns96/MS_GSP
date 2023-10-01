@@ -132,25 +132,50 @@ def filter(L, mis, num_sequences):
     :num_sequences: number of sequences in S (len(S))
     :return: A dictionary with key being the item, value being count.
     '''
-    ret = {}
+    ret = []
     for candidate in L:
         #val = supportcounts[candidate]/num_sequences # f.count / n
         if L[candidate]/num_sequences >= mis[candidate]:
-            ret[candidate] = L[candidate]
+            ret.append((candidate, ))
     return ret
+
+
+def is_contained(c,s):
+    for subset in s:
+        contains_all = True
+        for item in c:
+            if item not in subset:
+                contains_all = False
+                break
+        if contains_all:
+            return True
+    return False
 
 # GSP algorithm:
 def GSP(S,m,mis):
     L = init_pass(S,m,mis)
     print("L: ",L)
     print("\n************\n")
-    F = filter(L, mis, len(S))
+    F = [] # frequent itemsets
+    F.append(filter(L, mis, len(S))) # F1
     print("F: ", F)
     print("\n************\n")
-    lvl2 = level2_candidate_gen(L, 0.1, mis, len(L))
-    lvl2_SPM = level2_candidate_gen_SPM(L, 0.1, mis, len(L))
-    print(len(lvl2))
-    print(len(lvl2_SPM))
+    k = 2
+    while len(F[k-2]) != 0: # for (k=2; Fk-1 not empty; k++), F[k-2] is Fk-1
+        if k == 2:
+            Ck = level2_candidate_gen_SPM(L, 0.1, mis, len(L))
+        else:
+            Ck = mscandidate_gen_SPM(F[k-2], mis) # F[k-2] is Fk-1
+
+        count_c = {} # to keep track of "count" of each candidate
+        count_c_rest = {} # to keep count of "c.rest"
+        for s in S:
+            for c in Ck:
+                if is_contained(c, s):
+                    count_c[c] = count_c.get(c, 0) + 1
+
+
+        k += 1 # k++
 
 
 if __name__ == "__main__":

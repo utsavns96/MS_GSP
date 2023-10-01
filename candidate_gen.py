@@ -46,6 +46,22 @@ def level2_candidate_gen_SPM(L, phi, mis, num_sequences):
                                 C2.add((h,))
     return C2
 
+def join_step(Fk_1):
+    Ck = set()
+    for s1 in Fk_1:
+        for s2 in Fk_1:
+            # if the subsequence obtained by dropping the first item of s1
+            # is the same as the subsequence obtained by dropping the last item of s2,
+            if s1[1:] == s2[:-1]:
+                # the candidate sequence is the sequence s1 extended with the last item in s2
+                new_sequence = s1 + [s2[-1]]
+                Ck.add((new_sequence,))
+    return Ck
+
+def mscandidate_gen_SPM(Fk_1, mis):
+    Ck = set()
+    s1 = Fk_1[0]
+    Ck = join_step(Fk_1) # 1. Join Step
 
 if __name__ == "__main__":
     for i in range(10, 100, 10):
