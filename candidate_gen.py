@@ -42,8 +42,7 @@ def level2_candidate_gen_SPM(L, phi, mis, num_sequences):
                                 if l_index < h_index:
                                     new_sequence = [l,h]
                                     C2.add(tuple(new_sequence))
-                                C2.add((l,))
-                                C2.add((h,))
+                                    C2.add(((l,),(h,)))
     return C2
 
 def join_step(Fk_1):

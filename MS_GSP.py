@@ -140,16 +140,55 @@ def filter(L, mis, num_sequences):
     return ret
 
 
-def is_contained(c,s):
+def is_contained(c, s):
     for subset in s:
         contains_all = True
         for item in c:
-            if item not in subset:
-                contains_all = False
-                break
+            if isinstance(item, tuple):
+                for i in item:
+                    if i not in subset:
+                        contains_all = False
+                        break
+            else:
+                if item not in subset:
+                    contains_all = False
+                    break
         if contains_all:
             return True
     return False
+
+def minMIS(c,mis):
+    # temp = []
+    # for i in c:
+    #     temp.append(mis[i])
+    # c2 = [x for _,x in sorted(zip(temp,c))]
+    # min_mis = mis[c2[0]]
+    # for index, i in enumerate(c):
+    #     if mis[i] == min_mis:
+    #         return i
+    if isinstance(c[0], tuple):
+        min_mis = mis[c[0][0]]
+    else:
+        min_mis = mis[c[0]]
+    for tup in c:
+        if isinstance(tup, tuple):
+            for item in tup:
+                if mis[item] < min_mis:
+                    min_mis = mis[item]
+        else:
+            if mis[tup] < min_mis:
+                min_mis = mis[tup]
+    return min_mis
+
+def print_k_sequence(Fk, k, output):
+    output.write("**************************************\n{}-sequences:\n\n".format(k))
+    print_sequences = ""
+    for f in Fk:
+        sequence = '{' + '}{'.join(map(str, f)) + '}'
+        print_sequences += "<" + sequence + ">\n"
+    output.write(print_sequences + "\n")
+    output.write("The count is: {}\n".format(len(Fk)))
+
 
 # GSP algorithm:
 def GSP(S,m,mis):
@@ -158,25 +197,39 @@ def GSP(S,m,mis):
     print("\n************\n")
     F = [] # frequent itemsets
     F.append(filter(L, mis, len(S))) # F1
+    # writing to file
+    output = open("output.txt", "w")
+    print_k_sequence(F[0], 1, output)
     print("F: ", F)
     print("\n************\n")
     k = 2
+    count_c = {}  # to keep track of "count" of each candidate
     while len(F[k-2]) != 0: # for (k=2; Fk-1 not empty; k++), F[k-2] is Fk-1
         if k == 2:
             Ck = level2_candidate_gen_SPM(L, 0.1, mis, len(L))
         else:
-            Ck = mscandidate_gen_SPM(F[k-2], mis) # F[k-2] is Fk-1
+            break
+            # Ck = mscandidate_gen_SPM(F[k-2], mis) # F[k-2] is Fk-1
 
-        count_c = {} # to keep track of "count" of each candidate
-        count_c_rest = {} # to keep count of "c.rest"
         for s in S:
             for c in Ck:
                 if is_contained(c, s):
                     count_c[c] = count_c.get(c, 0) + 1
-
-
+                    # if c’ is contained in s, where c’ is c after an occurrence of c.minMISItem is removed from c
+                mis_c = minMIS(c,mis)
+                # c_list = list(c)
+                # c_list.remove(mis_c)  # removing occurence of m.minMISItem from c
+                # c2 = tuple(c_list)
+                # if is_contained(c2, s):
+                #     count_c[c] = count_c.get(c, 0) + 1
+        Fk = set()
+        for c in Ck:
+            if c in count_c and count_c[c]/len(S) >= minMIS(c, mis):
+                Fk.add(c)
+        print_k_sequence(Fk, k, output)
+        F.append(Fk)
         k += 1 # k++
-
+    return F
 
 if __name__ == "__main__":
     data = readdata()
@@ -190,4 +243,5 @@ if __name__ == "__main__":
     m = sortdata(data,mis)
     print("Sorted Data:\n",m)
     print("\n************\n")
-    GSP(data,m, mis)
+    F = GSP(data,m, mis)
+    print(F)
