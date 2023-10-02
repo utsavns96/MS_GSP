@@ -180,6 +180,28 @@ def minMIS(c,mis):
                 min_mis = mis[tup]
     return min_mis
 
+
+def remove_mis(c, min_mis, mis):
+    removed = False
+    c2 = []
+    for tup in c:
+        if isinstance(tup, tuple):
+            new_tup = []
+            for item in tup:
+                if not removed and mis[item] == min_mis:
+                    removed = True
+                else:
+                    new_tup.append(item)
+            if len(new_tup) > 0:
+                c2.append(tuple(new_tup))
+        else:
+            if not removed and mis[tup] == min_mis:
+                removed = True
+            else:
+                c2.append(tup)
+    return tuple(c2, )
+
+
 def print_k_sequence(Fk, k, output):
     output.write("**************************************\n{}-sequences:\n\n".format(k))
     print_sequences = ""
@@ -217,11 +239,13 @@ def GSP(S,m,mis):
                     count_c[c] = count_c.get(c, 0) + 1
                     # if c’ is contained in s, where c’ is c after an occurrence of c.minMISItem is removed from c
                 mis_c = minMIS(c,mis)
+                c2 = remove_mis(c, mis_c, mis)
+                # print(c2)
                 # c_list = list(c)
                 # c_list.remove(mis_c)  # removing occurence of m.minMISItem from c
                 # c2 = tuple(c_list)
-                # if is_contained(c2, s):
-                #     count_c[c] = count_c.get(c, 0) + 1
+                if is_contained(c2, s):
+                    count_c[c2] = count_c.get(c2, 0) + 1
         Fk = set()
         for c in Ck:
             if c in count_c and count_c[c]/len(S) >= minMIS(c, mis):

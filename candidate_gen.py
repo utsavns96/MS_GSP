@@ -57,14 +57,15 @@ def join_step(Fk_1):
                 Ck.add((new_sequence,))
     return Ck
 
+
 def mscandidate_gen_SPM(Fk_1, mis):
     Ck = set()
     s1 = Fk_1[0]
-    Ck = join_step(Fk_1) # 1. Join Step
+    Ck = join_step(Fk_1)  # 1. Join Step
+
 
 if __name__ == "__main__":
     for i in range(10, 100, 10):
         print("{}: {}".format(i, sup(i, data)))
 
     L = init_pass(data, m, mis)
-
