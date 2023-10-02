@@ -206,7 +206,20 @@ def print_k_sequence(Fk, k, output):
     output.write("**************************************\n{}-sequences:\n\n".format(k))
     print_sequences = ""
     for f in Fk:
-        sequence = '{' + '}{'.join(map(str, f)) + '}'
+        sequence = ""
+        if isinstance(f, tuple):
+            is_nested_tuple = True
+            for i in f:
+                if not isinstance(i, tuple):
+                    is_nested_tuple = False
+                    break
+            if is_nested_tuple:
+                for item in f:
+                    sequence += '{' + ','.join(map(str, item)) + '}'
+            else:
+                sequence = '{' + ','.join(map(str, f)) + '}'
+        else:
+            sequence = '{' + str(f) + '}'
         print_sequences += "<" + sequence + ">\n"
     output.write(print_sequences + "\n")
     output.write("The count is: {}\n".format(len(Fk)))
