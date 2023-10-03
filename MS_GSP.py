@@ -251,7 +251,7 @@ def print_k_sequence(Fk, k, output):
 
 
 # GSP algorithm:
-def GSP(S,m,mis):
+def GSP(S,m,mis, sdc):
     L = init_pass(S,m,mis)
     print("L: ",L)
     print("\n************\n")
@@ -266,7 +266,7 @@ def GSP(S,m,mis):
     count_c = {}  # to keep track of "count" of each candidate
     while len(F[k-2]) != 0: # for (k=2; Fk-1 not empty; k++), F[k-2] is Fk-1
         if k == 2:
-            Ck = level2_candidate_gen_SPM(L, 0.1, mis, len(L))
+            Ck = level2_candidate_gen_SPM(L, sdc, mis, len(L))
         else:
             break
             #Ck = mscandidate_gen_SPM(F[k-2], mis) # F[k-2] is Fk-1
@@ -305,5 +305,5 @@ if __name__ == "__main__":
     m = sortdata(data,mis)
     print("Sorted Data:\n",m)
     print("\n************\n")
-    F = GSP(data,m, mis)
+    F = GSP(data,m, mis, sdc)
     print(F)
