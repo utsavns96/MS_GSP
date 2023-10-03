@@ -3,7 +3,7 @@ from MS_GSP import readdata, readparam, init_pass, sortdata
 data = readdata()
 mis, sdc = readparam()
 m = sortdata(data, mis)
-
+rest = -998
 
 def sup(item, data):
     ret = 0
@@ -29,10 +29,15 @@ def level2_candidate_gen(L, phi, mis, num_sequences):
 def level2_candidate_gen_SPM(L, phi, mis, num_sequences):
     C2 = set()
     keys = list(L.keys())
+    mis_l = 0.0
     for index, l in enumerate(L):
-        if L[l] / num_sequences >= mis[l]:
+        if l in mis:
+            mis_l = mis[l]
+        else:
+            mis_l = mis[rest]
+        if L[l] / num_sequences >= mis_l:
             for h in keys[index + 1:]:  # "for each item h in L that is after l, do:"
-                if L[h] / num_sequences >= mis[l] and abs(sup(h, data) - sup(l, data)) <= phi:
+                if L[h] / num_sequences >= mis_l and abs(sup(h, data) - sup(l, data)) <= phi:
                     # join step: merge sequences containing l and h
                     for sequence in data:
                         for sub_sequence in sequence:
@@ -42,7 +47,11 @@ def level2_candidate_gen_SPM(L, phi, mis, num_sequences):
                                 if l_index < h_index:
                                     new_sequence = [l,h]
                                     C2.add(tuple(new_sequence))
-                                    C2.add(((l,),(h,)))
+                                else:
+                                    new_sequence = [h,l]
+                                    C2.add(tuple(new_sequence))
+                                C2.add(((l,),(h,)))
+                                C2.add(((h,),(l,)))
     return C2
 
 

@@ -3,6 +3,8 @@
 import re
 from candidate_gen import *
 
+rest = -998
+
 def readdata():
     '''
     Read input data file and format it as a list of lists
@@ -60,6 +62,8 @@ def readparam():
             item = temp[0][temp[0].find("(")+1:temp[0].find(")")]
             #item = re.findall(r'\(.*?\)', temp[0])
             value = float(temp[1].rstrip("\n"))
+            if item == 'rest':
+                item = rest
             mis[int(item)] = value
             #print(item,"-",value)
         #print(line)
@@ -83,7 +87,10 @@ def sortdata(data,mis):
             for item in sequence:
                 if(item not in m):
                     m.append(item)
-                    temp.append(mis[item])
+                    if item in mis:
+                        temp.append(mis[item])
+                    else:
+                        temp.append(mis[rest])
     m = [x for _,x in sorted(zip(temp,m))]
     return m
 
@@ -111,10 +118,16 @@ def init_pass(S,m,mis):
     #find the first item i in M that meets MIS(i)
     for i in m:
         if(len(L)==0):
-            if(supportcounts[i]/len(data) >= mis[i]):
-                #L.append(i)
-                mis_i = mis[i]
-                L[i]=supportcounts[i]
+            if i in mis:
+                if(supportcounts[i]/len(data) >= mis[i]):
+                    #L.append(i)
+                    mis_i = mis[i]
+                    L[i]=supportcounts[i]
+            else:
+                if(supportcounts[i]/len(data) >= mis[rest]):
+                    #L.append(i)
+                    mis_i = mis[rest]
+                    L[i]=supportcounts[i]
         # For each subsequent item j in M after i, if j.count/n >= MIS(i), then j is also inserted into L
         else:
             if(supportcounts[i]/len(data) >= mis_i):
@@ -135,8 +148,12 @@ def filter(L, mis, num_sequences):
     ret = []
     for candidate in L:
         #val = supportcounts[candidate]/num_sequences # f.count / n
-        if L[candidate]/num_sequences >= mis[candidate]:
-            ret.append((candidate, ))
+        if candidate in mis:
+            if L[candidate]/num_sequences >= mis[candidate]:
+                ret.append((candidate, ))
+        else:
+            if L[candidate]/num_sequences >= mis[rest]:
+                ret.append((candidate, ))
     return ret
 
 
@@ -173,11 +190,16 @@ def minMIS(c,mis):
     for tup in c:
         if isinstance(tup, tuple):
             for item in tup:
-                if mis[item] < min_mis:
+                if item in mis and mis[item] < min_mis:
                     min_mis = mis[item]
+                else:
+                    if mis[rest] < min_mis:
+                        min_mis = mis[rest]
         else:
-            if mis[tup] < min_mis:
+            if tup in mis and mis[tup] < min_mis:
                 min_mis = mis[tup]
+            else:
+                min_mis = mis[rest]
     return min_mis
 
 
@@ -243,8 +265,8 @@ def GSP(S,m,mis):
         if k == 2:
             Ck = level2_candidate_gen_SPM(L, 0.1, mis, len(L))
         else:
-            # break
-            Ck = mscandidate_gen_SPM(F[k-2], mis) # F[k-2] is Fk-1
+            break
+            #Ck = mscandidate_gen_SPM(F[k-2], mis) # F[k-2] is Fk-1
 
         for s in S:
             for c in Ck:
