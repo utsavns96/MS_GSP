@@ -196,10 +196,12 @@ def minMIS(c,mis):
                     if mis[rest] < min_mis:
                         min_mis = mis[rest]
         else:
-            if tup in mis and mis[tup] < min_mis:
-                min_mis = mis[tup]
+            if tup in mis:
+                if mis[tup] < min_mis:
+                    min_mis = mis[tup]
             else:
-                min_mis = mis[rest]
+                if mis[rest] < min_mis:
+                    min_mis = mis[rest]
     return min_mis
 
 
@@ -265,8 +267,8 @@ def GSP(S,m,mis):
         if k == 2:
             Ck = level2_candidate_gen_SPM(L, 0.1, mis, len(L))
         else:
-            break
-            #Ck = mscandidate_gen_SPM(F[k-2], mis) # F[k-2] is Fk-1
+            #break
+            Ck = mscandidate_gen_SPM(F[k-2], mis) # F[k-2] is Fk-1
 
         for s in S:
             for c in Ck:
