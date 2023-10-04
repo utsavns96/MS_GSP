@@ -15,27 +15,32 @@ def readdata():
     lines = [] #holds lines of the input file
     temp = [] #temp list #1 - holds items in one record <>
     temp1 = [] #temp list #2 - holds items in one set of {}
-    f = open("data.txt", "r")
+    f = open("test-data/small-data-1/data-1.txt", "r")
+    #f = open("test-data/large-data-2/data2.txt", "r")
+    #f = open("data.txt", "r")
     for line in f:
         line = line.replace('<','')
         line = line.replace('>','')
         lines.append(line.rstrip('\n'))
     for t in lines:
-        t = t.strip()[1:-1]
-        for s in re.split(r'}{',t):
-            #print("new itemset")
-            for i in re.split(', ',s):
-                temp1.append(int(i))
-                #print(i)
-                #print("temp1 = ",temp1)
-            temp.append(temp1)
-            #print("temp = ",temp)
-            temp1 = []
-        data.append(temp)
-        temp = []
-        #print("new line")
-    #print(data)
-    f.close()
+        if not t:
+            continue
+        else:
+            t = t.strip()[1:-1]
+            for s in re.split(r'}{',t):
+                #print("new itemset")
+                for i in re.split(', ',s):
+                    temp1.append(int(i))
+                    #print(i)
+                    #print("temp1 = ",temp1)
+                temp.append(temp1)
+                #print("temp = ",temp)
+                temp1 = []
+            data.append(temp)
+            temp = []
+            #print("new line")
+        #print(data)
+        f.close()
     return data
     
 def readparam():
@@ -54,7 +59,11 @@ def readparam():
     temp = [] #temp list #1
     sdc = 0
     #print("\nParameters:")
-    f = open("para1-1.txt", "r")
+    f = open("test-data/small-data-1/para1-1.txt", "r")
+    #f = open("test-data/small-data-1/para1-2.txt", "r")
+    #f = open("test-data/large-data-2/para2-1.txt", "r")
+    #f = open("test-data/large-data-2/para2-2.txt", "r")
+    #f = open("para1-1.txt", "r")
     for line in f:
         #print(line.find("MIS"))
         if(line.find("MIS")==0):
