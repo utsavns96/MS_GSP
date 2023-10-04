@@ -4,6 +4,7 @@ import re
 from candidate_gen import *
 
 rest = -998
+count_c = {}  # to keep track of "count" of each candidate
 
 def readdata():
     '''
@@ -263,7 +264,6 @@ def GSP(S,m,mis, sdc):
     print("F: ", F)
     print("\n************\n")
     k = 2
-    count_c = {}  # to keep track of "count" of each candidate
     while len(F[k-2]) != 0: # for (k=2; Fk-1 not empty; k++), F[k-2] is Fk-1
         if k == 2:
             Ck = level2_candidate_gen_SPM(L, sdc, mis, len(L))

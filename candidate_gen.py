@@ -1,4 +1,5 @@
-from MS_GSP import readdata, readparam, init_pass, sortdata
+from MS_GSP import readdata, readparam, init_pass, sortdata, minMIS
+from copy import deepcopy
 
 data = readdata()
 mis, sdc = readparam()
@@ -98,13 +99,125 @@ def join_step(s1, s2):
     return new_tup
 
 def Size(s):
-    size = 0
-    if isinstance(s[0], tuple):
-        for _ in s:
-            size += 1
-    else:
-        size = 1
-    return size
+    return len(s)
+
+def Length(s):
+    return len(flatten_subsequence(s))
+
+def prune_step(Fk_1,Ck, mis):
+    final_Ck = set()
+    for index_c, c in enumerate(Ck):
+        c_list = []
+        temp_list = []
+        for i in c:
+            c_list.append(i)
+        for index_seq, seq_t in enumerate(c_list):
+            seq = []
+            if(isinstance(c_list[0], tuple)):
+                for s in seq_t:
+                    seq.append(s)
+            else:
+                seq = list(c_list)
+            #1. find minMIS and item with minMIS
+            min_mis_seq_item = seq[0]
+            for item in seq:
+                if(mis[item]<mis[min_mis_seq_item]):
+                    min_mis_seq_item = item
+            #print("min_mis_seq_item: ", min_mis_seq_item)
+            #2. find all k-1 sequences and store them in a list
+            for index_i, i in enumerate(seq):
+                temp_c = []
+                if(isinstance(c_list[0], tuple)):
+                    for a in c_list:
+                        temp_c.append(list(a))
+                else:
+                    temp_c_temp = list(c_list)
+                    temp_c.append(list(temp_c_temp))
+                # for a in c_list:
+                #     temp_c.append(list(a))
+                if(temp_c[index_seq][index_i] == min_mis_seq_item):
+                    del temp_c[index_seq][index_i]
+                    temp_c = list(filter(None, temp_c))
+                    temp_list.append(list(temp_c))
+        print(temp_list)
+        temp = 0
+        #3. iterate through them and compare with Fk_1
+        #first convert Fk_1 to list of lists
+        f_list = []
+        for f_k in Fk_1:
+            temp_f = []
+            if(isinstance(f_k[0], tuple)):
+                for f in f_k:
+                    temp_f.append(list(f))
+            else:
+                temp_f = list(f_k)
+            f_list.append(list(temp_f))
+        #print(f_list)
+        for temp_l in temp_list:
+            if (not any(temp_l == f_items for f_items in f_list)):
+                temp += 1
+            if temp == 0:
+                final_Ck.add(c)
+    return final_Ck
+        
+
+        
+    # count = 0
+    # for c in Ck:
+    #     count = 0
+    #     temp_c = deepcopy(c)
+    #     temp_list = []
+    #     for index_seq, seq_t in enumerate(c):
+    #         seq = []
+    #         for s in seq_t:
+    #             seq.append(s)
+    #         min_mis_seq_item = seq[0]
+    #         for item in seq:
+    #             if(mis[item]<mis[min_mis_seq_item]):
+    #                 min_mis_seq_item = item
+
+    #         for index_i, i in enumerate(seq):
+    #             temp_c = []
+    #             for a in c:
+    #                 temp_c.append(list(a))
+    #             if(temp_c[index_seq][index_i] == min_mis_seq_item):
+    #                 del temp_c[index_seq][index_i]
+    #                 temp_c = list(filter(None, temp_c))
+    #                 temp_list.append(temp_c)
+    #     temp = 0
+
+    #     for temp_l in temp_list:
+    #         if (not any(temp_l == f_items for f_items in Fk_1)):
+    #             temp += 1
+    #         if temp == 0:
+    #             final_Ck.add(c)
+    return final_Ck
+
+        # frequent = False
+        # #condition 1: {{a},{b},{c}}
+        # if(Length(c)==Size(c)):
+        #     for i in range(0, len(c)):
+        #         c_list = list(c)
+        #         del c_list[i]
+        #         for f in Fk_1:
+        #             if c_list in list(f):
+        #                 frequent = True 
+        #         print(c_list)
+        # #condition 2: {{a,b,c}}
+        # elif Size(c)==1:
+        #     for f in Fk_1:
+        #         if c in list(f):
+        #             frequent = True
+        # #condition 3: {{a,b},{c}} and #condition 4: {{a},{b,c}}
+        # else:
+        #     break
+        
+  
+        #print("c: ",c)
+        #print("f: ",f)                
+
+    return final_Ck
+
 
 def mscandidate_gen_SPM(Fk_1, mis):
     Ck = set()
@@ -151,10 +264,10 @@ def mscandidate_gen_SPM(Fk_1, mis):
                         #print("Ck: {}".format(Ck))
                         s1_last_item = flatten_subsequence(s1[-1:]) if isinstance(s1[-1:], tuple) else s1[-1:]
                         s2_last_item = flatten_subsequence(s2[-1:]) if isinstance(s2[-1:], tuple) else s2[-1:]
-                        if Size(s1) == 2 and len(s1)==2 and s2_last_item > s1_last_item: 
+                        if Length(s1) == 2 and Size(s1)==2 and s2_last_item > s1_last_item: 
                             c2 = list(s1)
                             c2.append(flatten_subsequence(s2[-1]))
-                    elif (Size(s1) == 1 and len(s1)==2 and s2_last_item > s1_last_item) or (len(s1)>2):
+                    elif (Length(s1) == 1 and Size(s1)==2 and s2_last_item > s1_last_item) or (Length(s1)>2):
                         c2 = list(s1)
                         c2.append(flatten_subsequence(s2[-1]))
                     
@@ -170,6 +283,7 @@ def mscandidate_gen_SPM(Fk_1, mis):
          
     for c in Ck:
         print(c,"\n")
+    prune_step(Fk_1,Ck, mis) # 2. Prune Step
     return Ck
 
 if __name__ == "__main__":
