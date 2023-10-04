@@ -268,8 +268,8 @@ def GSP(S,m,mis, sdc):
         if k == 2:
             Ck = level2_candidate_gen_SPM(L, sdc, mis, len(L))
         else:
-            break
-            #Ck = mscandidate_gen_SPM(F[k-2], mis) # F[k-2] is Fk-1
+            # break
+            Ck = mscandidate_gen_SPM(F[k-2], mis) # F[k-2] is Fk-1
 
         for s in S:
             for c in Ck:
@@ -307,3 +307,7 @@ if __name__ == "__main__":
     print("\n************\n")
     F = GSP(data,m, mis, sdc)
     print(F)
+    # print(is_contained((10,40), [[10, 40, 50], [40, 90]])) # True
+    # print(is_contained(((10, 50),), [[10, 40, 50], [40, 90]])) # True
+    # print(is_contained(((10,), (50,)), [[10, 40, 50], [40, 90]])) # False
+    # print(is_contained(((50,10),),[[10, 470, 50], [40, 90]]))
