@@ -194,6 +194,8 @@ def is_orderedsubset(s1, s2):
             return False
     return True
 
+def is_subset(subset, main_list):
+    return all(item in main_list for item in subset)
 
 def sumtaken(taken):
     count = 0
@@ -203,23 +205,27 @@ def sumtaken(taken):
     return count
 
 def is_contained(c, s):
+    c_taken = []
     taken = []
     for subseq in s:
         taken.append(0)
+    for subseq in c:
+        c_taken.append(0)
     if not isinstance(c[0], tuple): # C is a 2-tuple of ints
         for subseq in s:
-            if is_orderedsubset(c, subseq):
+            if is_subset(c, subseq):
                 return True
     else:
-       for item in c:
-            for idx, subseq in enumerate(s):
-                if is_orderedsubset(item, subseq):
-                    if taken[idx] == 1 and sumtaken(taken) == len(c):
-                        return False
-                    elif taken[idx] != 1:
-                        taken[idx] = 1
+       for i, item in enumerate(c):
+            for j, subseq in enumerate(s):
+                if is_subset(item, subseq):
+                    if taken[j] != 1:
+                        taken[j]= 1
+                        c_taken[i] = 1
                         break
-    if sumtaken(taken) == len(c):
+                else:
+                    taken[j] = 1
+    if sumtaken(c_taken) == len(c):
         return True
     return False
 
@@ -317,7 +323,7 @@ def GSP(S,m,mis, sdc):
         if k == 2:
             Ck = level2_candidate_gen_SPM(L, sdc, mis, len(L))
         else:
-            #break
+            # break
             Ck = mscandidate_gen_SPM(F[k-2], mis) # F[k-2] is Fk-1
         for s in S:
             for c in Ck:
@@ -337,6 +343,10 @@ def GSP(S,m,mis, sdc):
             if c in count_c and count_c[c]/len(S) >= minMIS(c, mis):
                 Fk.add(c)
         print_k_sequence(Fk, k, output)
+
+        # debug
+        # for c in Fk:
+        #     print("{} - count: {}".format(c, count_c[c]))
         F.append(Fk)
         k += 1 # k++
     return F
@@ -363,3 +373,11 @@ if __name__ == "__main__":
     # print(is_contained(((80,), (70,)), [[20, 30], [70, 80], [20, 30, 70]])) # True
     # print(is_contained(((30,), (70,)), [[20, 30, 70, 80],[50, 70]])) # True
     # print(is_contained(((30,), (70,)), [[20, 30],[70, 80],[20, 30, 70]]))  # True
+    # test = ((80,), (70,))
+    # print(test)
+    # for s in data:
+    #     print("{} - {}".format(s, is_contained(test, s)))
+    # print(is_contained(test, [[20, 30, 70, 80], [50, 70]]))
+    # print(is_contained(test, [[20, 30], [30, 70, 80]]))
+    # print(is_contained(test, [[70],[30]]))
+    # print(is_contained(test,[[20, 30], [70, 80], [20, 30, 70]]))
