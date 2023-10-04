@@ -157,20 +157,61 @@ def filter(L, mis, num_sequences):
     return ret
 
 
+# def is_contained(c, s):
+#     for subset in s:
+#         contains_all = True
+#         for item in c:
+#             if isinstance(item, tuple):
+#                 for i in item:
+#                     if i not in subset:
+#                         contains_all = False
+#                         break
+#             else:
+#                 if item not in subset:
+#                     contains_all = False
+#                     break
+#         if contains_all:
+#             return True
+#     return False
+
+def is_orderedsubset(s1, s2):
+    first_index = -1
+    for idx, item in enumerate(s2):
+        if item == s1[0]:
+            first_index = idx
+            break
+    if first_index == -1:
+        return False
+
+    idx_2 = first_index
+
+    for idx, item in enumerate(s1):
+        if idx_2 >= len(s2):
+            return False
+        if item == s2[idx_2]:
+            idx_2 += 1
+        else:
+            return False
+    return True
+
+
 def is_contained(c, s):
-    for subset in s:
-        contains_all = True
-        for item in c:
-            if isinstance(item, tuple):
-                for i in item:
-                    if i not in subset:
-                        contains_all = False
-                        break
-            else:
-                if item not in subset:
-                    contains_all = False
-                    break
-        if contains_all:
+    taken = []
+    for subseq in s:
+        taken.append(0)
+    if not isinstance(c[0], tuple): # C is a 2-tuple of ints
+        for subseq in s:
+            if is_orderedsubset(c, subseq):
+                return True
+    else:
+       for item in c:
+            for idx, subseq in enumerate(s):
+                if is_orderedsubset(item, subseq):
+                    if taken[idx] == 1:
+                        return False
+                    taken[idx] = 1
+    for i in taken:
+        if i == 1:
             return True
     return False
 
@@ -307,6 +348,6 @@ if __name__ == "__main__":
     F = GSP(data,m, mis, sdc)
     print(F)
     # print(is_contained((10,40), [[10, 40, 50], [40, 90]])) # True
-    # print(is_contained(((10, 50),), [[10, 40, 50], [40, 90]])) # True
+    # print(is_contained(((10, 50),), [[10, 40, 50], [40, 90]])) # False
     # print(is_contained(((10,), (50,)), [[10, 40, 50], [40, 90]])) # False
-    # print(is_contained(((50,10),),[[10, 470, 50], [40, 90]]))
+    # print(is_contained((50,10), [[10, 40, 50], [40, 90]])) # False
