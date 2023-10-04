@@ -133,7 +133,7 @@ def mscandidate_gen_SPM(Fk_1, mis):
             # check for condition 2
             if (not s1_first_smallest):
                 for index, i in enumerate(s2[:-1]):
-                    mis_i = mis[flatten_subsequence(s2[:-1])] if isinstance(i, tuple) else mis[i]
+                    mis_i = mis[flatten_subsequence(s2)[-1]] if isinstance(i, tuple) else mis[i]
                     if index < len(s2[:-1]) -1 and mis_i<s2_last_mis:
                         s2_last_smallest = False
                     elif index == len(s2[:-1]) -1 and mis_i<s2_last_mis:
