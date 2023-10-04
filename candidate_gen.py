@@ -38,21 +38,16 @@ def level2_candidate_gen_SPM(L, phi, mis, num_sequences):
             mis_l = mis[rest]
         if L[l] / num_sequences >= mis_l:
             for h in keys[index + 1:]:  # "for each item h in L that is after l, do:"
-                if L[h] / num_sequences >= mis_l and abs(sup(h, data) - sup(l, data)) <= phi:
+                if L[h] / num_sequences >= mis_l and abs(L[h] / num_sequences - L[l] / num_sequences) <= phi:
                     # join step: merge sequences containing l and h
-                    for sequence in data:
-                        for sub_sequence in sequence:
-                            if l in sub_sequence and h in sub_sequence:
-                                l_index = sub_sequence.index(l)
-                                h_index = sub_sequence.index(h)
-                                if l_index < h_index:
-                                    new_sequence = [l,h]
-                                    C2.add(tuple(new_sequence))
-                                else:
-                                    new_sequence = [h,l]
-                                    C2.add(tuple(new_sequence))
-                                C2.add(((l,),(h,)))
-                                C2.add(((h,),(l,)))
+                    if l <= h:
+                        new_sequence = [l, h]
+                        C2.add(tuple(new_sequence))
+                    else:
+                        new_sequence = [h, l]
+                        C2.add(tuple(new_sequence))
+                    C2.add(((l,), (h,)))
+                    C2.add(((h,),(l,)))
     return C2
 
 
@@ -109,15 +104,22 @@ def prune_step(Fk_1,Ck, mis):
     for index_c, c in enumerate(Ck):
         c_list = []
         temp_list = []
-        for i in c:
-            c_list.append(i)
+        if isinstance(c[0], tuple):
+            for i in c:
+                c_list.append(i)
+        else:
+            t = []
+            for i in c:
+                t.append(i)
+            c_list.append(t)
+
         for index_seq, seq_t in enumerate(c_list):
             seq = []
             if(isinstance(c_list[0], tuple)):
                 for s in seq_t:
                     seq.append(s)
             else:
-                seq = list(c_list)
+                seq = seq_t
             #1. find minMIS and item with minMIS
             min_mis_seq_item = seq[0]
             for item in seq:
@@ -131,8 +133,7 @@ def prune_step(Fk_1,Ck, mis):
                     for a in c_list:
                         temp_c.append(list(a))
                 else:
-                    temp_c_temp = list(c_list)
-                    temp_c.append(list(temp_c_temp))
+                    temp_c = c_list
                 # for a in c_list:
                 #     temp_c.append(list(a))
                 if(temp_c[index_seq][index_i] == min_mis_seq_item):

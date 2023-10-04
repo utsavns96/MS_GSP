@@ -107,13 +107,22 @@ def init_pass(S,m,mis):
     #L=[]
     L={}
     #Step 1: Scan through data and record support count
-    for itemset in S:
-        for sequence in itemset:
-            for item in sequence:
-                if item in supportcounts:
-                    supportcounts[item] += 1
-                else:
-                    supportcounts[item] = 1
+    # for transaction in S:
+    #     for sequence in transaction:
+    #         for item in sequence:
+    #             if item in supportcounts:
+    #                 supportcounts[item] += 1
+    #             else:
+    #                 supportcounts[item] = 1
+    for i in m:
+        for transaction in S:
+            for sequence in transaction:
+                if i in sequence:
+                    if i in supportcounts:
+                        supportcounts[i] += 1
+                    else:
+                        supportcounts[i] = 1
+                    break
     #Step 2: follow sorted order to find the first item i in m that meets i.count/n >= MIS(i).
     mis_i = 0
     #find the first item i in M that meets MIS(i)
@@ -321,7 +330,7 @@ def GSP(S,m,mis, sdc):
     k = 2
     while len(F[k-2]) != 0: # for (k=2; Fk-1 not empty; k++), F[k-2] is Fk-1
         if k == 2:
-            Ck = level2_candidate_gen_SPM(L, sdc, mis, len(L))
+            Ck = level2_candidate_gen_SPM(L, sdc, mis, len(S))
         else:
             # break
             Ck = mscandidate_gen_SPM(F[k-2], mis) # F[k-2] is Fk-1
