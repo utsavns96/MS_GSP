@@ -55,8 +55,3 @@ The count is: 11
 <{20,30}{70,80}>
 
 The count is: 2
-**************************************
-5-sequences:
-
-
-The count is: 0

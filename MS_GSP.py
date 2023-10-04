@@ -91,6 +91,7 @@ def sortdata(data,mis):
                     if item in mis:
                         temp.append(mis[item])
                     else:
+                        mis[item] = mis[rest]
                         temp.append(mis[rest])
     m = [x for _,x in sorted(zip(temp,m))]
     return m
@@ -107,13 +108,6 @@ def init_pass(S,m,mis):
     #L=[]
     L={}
     #Step 1: Scan through data and record support count
-    # for transaction in S:
-    #     for sequence in transaction:
-    #         for item in sequence:
-    #             if item in supportcounts:
-    #                 supportcounts[item] += 1
-    #             else:
-    #                 supportcounts[item] = 1
     for i in m:
         for transaction in S:
             for sequence in transaction:
@@ -166,24 +160,6 @@ def filter(L, mis, num_sequences):
                 ret.append((candidate, ))
     return ret
 
-
-# def is_contained(c, s):
-#     for subset in s:
-#         contains_all = True
-#         for item in c:
-#             if isinstance(item, tuple):
-#                 for i in item:
-#                     if i not in subset:
-#                         contains_all = False
-#                         break
-#             else:
-#                 if item not in subset:
-#                     contains_all = False
-#                     break
-#         if contains_all:
-#             return True
-#     return False
-
 def is_orderedsubset(s1, s2):
     first_index = -1
     for idx, item in enumerate(s2):
@@ -204,8 +180,8 @@ def is_orderedsubset(s1, s2):
             return False
     return True
 
-def is_subset(subset, main_list):
-    return all(item in main_list for item in subset)
+def is_subset(s1, s2):
+    return all(item in s2 for item in s1)
 
 def sumtaken(taken):
     count = 0
@@ -240,14 +216,6 @@ def is_contained(c, s):
     return False
 
 def minMIS(c,mis):
-    # temp = []
-    # for i in c:
-    #     temp.append(mis[i])
-    # c2 = [x for _,x in sorted(zip(temp,c))]
-    # min_mis = mis[c2[0]]
-    # for index, i in enumerate(c):
-    #     if mis[i] == min_mis:
-    #         return i
     if isinstance(c[0], tuple):
         min_mis = mis[c[0][0]]
     else:
@@ -332,7 +300,6 @@ def GSP(S,m,mis, sdc):
         if k == 2:
             Ck = level2_candidate_gen_SPM(L, sdc, mis, len(S))
         else:
-            # break
             Ck = mscandidate_gen_SPM(F[k-2], mis) # F[k-2] is Fk-1
         for s in S:
             for c in Ck:
@@ -341,21 +308,14 @@ def GSP(S,m,mis, sdc):
                     # if c’ is contained in s, where c’ is c after an occurrence of c.minMISItem is removed from c
                 mis_c = minMIS(c,mis)
                 c2 = remove_mis(c, mis_c, mis)
-                # print(c2)
-                # c_list = list(c)
-                # c_list.remove(mis_c)  # removing occurence of m.minMISItem from c
-                # c2 = tuple(c_list)
                 if is_contained(c2, s):
                     count_c[c2] = count_c.get(c2, 0) + 1
         Fk = set()
         for c in Ck:
             if c in count_c and count_c[c]/len(S) >= minMIS(c, mis):
                 Fk.add(c)
-        print_k_sequence(Fk, k, output)
-
-        # debug
-        # for c in Fk:
-        #     print("{} - count: {}".format(c, count_c[c]))
+        if(len(Fk) > 0):
+            print_k_sequence(Fk, k, output)
         F.append(Fk)
         k += 1 # k++
     return F
@@ -374,24 +334,3 @@ if __name__ == "__main__":
     print("\n************\n")
     F = GSP(data,m, mis, sdc)
     print(F)
-    # test_set = set()
-    # test_set.add(((20,30),(30,)))
-    # test_set.add(((30,),(30,70)))
-
-    # Ck = mscandidate_gen_SPM(test_set, mis)
-    # print(is_contained((10,40), [[10, 40, 50], [40, 90]])) # True
-    # print(is_contained(((10, 50),), [[10, 40, 50], [40, 90]])) # False
-    # print(is_contained(((10,), (50,)), [[10, 40, 50], [40, 90]])) # False
-    # print(is_contained((50,10), [[10, 40, 50], [40, 90]])) # False
-    # #
-    # print(is_contained(((80,), (70,)), [[20, 30], [70, 80], [20, 30, 70]])) # True
-    # print(is_contained(((30,), (70,)), [[20, 30, 70, 80],[50, 70]])) # True
-    # print(is_contained(((30,), (70,)), [[20, 30],[70, 80],[20, 30, 70]]))  # True
-    # test = ((80,), (70,))
-    # print(test)
-    # for s in data:
-    #     print("{} - {}".format(s, is_contained(test, s)))
-    # print(is_contained(test, [[20, 30, 70, 80], [50, 70]]))
-    # print(is_contained(test, [[20, 30], [30, 70, 80]]))
-    # print(is_contained(test, [[70],[30]]))
-    # print(is_contained(test,[[20, 30], [70, 80], [20, 30, 70]]))

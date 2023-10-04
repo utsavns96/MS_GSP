@@ -21,7 +21,7 @@ def level2_candidate_gen(L, phi, mis, num_sequences):
     keys = list(L.keys())
     for index, l in enumerate(L):
         if L[l] / num_sequences >= mis[l]:
-            for h in keys[index + 1:]:  # "for each item h in L that is after l, do:"
+            for h in keys[index:]:  # "for each item h in L that is after l, do:"
                 if L[h] / num_sequences >= mis[l] and abs(sup(h, data) - sup(l, data)) <= phi:
                     C2.add((l, h))  # insert the candidate {l,h} into C2
     return C2
@@ -66,7 +66,7 @@ def join_step(s1, s2):
     # is the same as the subsequence obtained by dropping the last item of s2,
     if flatten_subsequence(s1)[1:] == flatten_subsequence(s2)[:-1]:
         # the candidate sequence is the sequence s1 extended with the last item in s2
-        if isinstance(s2[-1], tuple) and Length(s2[-1]) == 1:
+        if isinstance(s2[-1], tuple) and Length(s2[-1]) == 1: # last item of s2 is a tuple {20}
             #new_sequence = list(s1)
             #new_sequence.append(s2[-1])
             #new_tup = tuple(new_sequence)
@@ -78,7 +78,7 @@ def join_step(s1, s2):
                 new_tup = tuple([s1,s2[-1]])
                 #new_tup=(tuple(list(s1)),s2[-1])
             #Ck.add(tuple(new_sequence))
-        elif isinstance(s2[-1], tuple) and Size(s1) > 1:
+        elif isinstance(s2[-1], tuple) and Size(s1) > 1: # last item of s2 is a tuple of size >1 i.e. {20,30}
             new_seq = list(s1[-1])
             new_item = s2[-1][-1]
             new_seq.append(new_item)
@@ -86,7 +86,7 @@ def join_step(s1, s2):
             new_tup = (list(s1[:1]))
             new_tup.append(new_seq)
             new_tup = tuple(new_tup)
-        else:
+        else: # S2 is not a tuple
             if isinstance(s1[-1], tuple):
                 new_sequence = s1[-1] + (s2[-1], )
                 new_tup = s1[:-1] + (tuple(new_sequence),)
@@ -95,7 +95,7 @@ def join_step(s1, s2):
                 new_sequence = list(s1)
                 if isinstance(s2[-1], int):
                     new_sequence.append(s2[-1])
-                else:
+                else: #{20,30}
                     new_sequence.append(s2[-1][-1])
                 new_tup = tuple(new_sequence)
                 #Ck.add(new_tup)
@@ -174,85 +174,16 @@ def prune_step(Fk_1,Ck, mis):
             if temp == 0:
                 final_Ck.add(c)
     return final_Ck
-        
-
-        
-    # count = 0
-    # for c in Ck:
-    #     count = 0
-    #     temp_c = deepcopy(c)
-    #     temp_list = []
-    #     for index_seq, seq_t in enumerate(c):
-    #         seq = []
-    #         for s in seq_t:
-    #             seq.append(s)
-    #         min_mis_seq_item = seq[0]
-    #         for item in seq:
-    #             if(mis[item]<mis[min_mis_seq_item]):
-    #                 min_mis_seq_item = item
-
-    #         for index_i, i in enumerate(seq):
-    #             temp_c = []
-    #             for a in c:
-    #                 temp_c.append(list(a))
-    #             if(temp_c[index_seq][index_i] == min_mis_seq_item):
-    #                 del temp_c[index_seq][index_i]
-    #                 temp_c = list(filter(None, temp_c))
-    #                 temp_list.append(temp_c)
-    #     temp = 0
-
-    #     for temp_l in temp_list:
-    #         if (not any(temp_l == f_items for f_items in Fk_1)):
-    #             temp += 1
-    #         if temp == 0:
-    #             final_Ck.add(c)
-    return final_Ck
-
-        # frequent = False
-        # #condition 1: {{a},{b},{c}}
-        # if(Length(c)==Size(c)):
-        #     for i in range(0, len(c)):
-        #         c_list = list(c)
-        #         del c_list[i]
-        #         for f in Fk_1:
-        #             if c_list in list(f):
-        #                 frequent = True 
-        #         print(c_list)
-        # #condition 2: {{a,b,c}}
-        # elif Size(c)==1:
-        #     for f in Fk_1:
-        #         if c in list(f):
-        #             frequent = True
-        # #condition 3: {{a,b},{c}} and #condition 4: {{a},{b,c}}
-        # else:
-        #     break
-        
-  
-        #print("c: ",c)
-        #print("f: ",f)                
-
-    return final_Ck
 
 
 def mscandidate_gen_SPM(Fk_1, mis):
     Ck = set()
-    #Ck = join_step(Fk_1)  # 1. Join Step
-    # Fk_test = set()
-    # # Fk_test.add(((20,), (30,)))
-    # # Fk_test.add((30,80))
-    # Fk_test.add((20, 30))
-    # Fk_test.add((30, 80))
-    # Ck = join_step(Fk_test)
     for s1 in Fk_1:
         s1_first_mis = mis[flatten_subsequence(s1)[0]] if isinstance(s1[0], tuple) else mis[s1[0]]
         s1_first_smallest = True
         # check for condition 1
         for index,i in enumerate(s1[1:]):
             mis_i = mis[flatten_subsequence(s1)[0]] if isinstance(i, tuple) else mis[i]
-            # if index < len(s1[1:]) -1 and mis_i<s1_first_mis:
-            #     s1_first_smallest = False
-            # elif index == len(s1[1:]) -1 and mis_i<s1_first_mis:
-            #     s1_first_smallest = True
             if s1_first_mis >= mis_i:
                 s1_first_smallest = False
         for s2 in Fk_1:
@@ -264,10 +195,6 @@ def mscandidate_gen_SPM(Fk_1, mis):
                 s2_last_smallest = True
                 for index, i in enumerate(s2[:-1]):
                     mis_i = mis[flatten_subsequence(s2)[-1]] if isinstance(i, tuple) else mis[i]
-                    # if index < len(s2[:-1]) -1 and mis_i<s2_last_mis:
-                    #     s2_last_smallest = False
-                    # elif index == len(s2[:-1]) -1 and mis_i<s2_last_mis:
-                    #     s2_last_smallest = True
                     if s2_last_mis >= mis_i:
                         s2_last_smallest = False
             # condition 1: if the MIS value of the first item in a sequence (denoted by s1) is < the MIS value of every other item in s1
@@ -278,8 +205,6 @@ def mscandidate_gen_SPM(Fk_1, mis):
                     if isinstance(s2[-1], tuple):
                         c1 = list(s1)
                         c1.append(s2[-1])
-                        #Ck.add(tuple(new_sequence))
-                        #print("Ck: {}".format(Ck))
                         s1_last_item = flatten_subsequence(s1[-1:]) if isinstance(s1[-1:], tuple) else s1[-1:]
                         s2_last_item = flatten_subsequence(s2[-1:]) if isinstance(s2[-1:], tuple) else s2[-1:]
                         if Length(s1) == 2 and Size(s1) == 2 and s2_last_item > s1_last_item:
