@@ -177,15 +177,16 @@ def prune_step(Fk_1,Ck, mis):
 
 def reverse(s):
     s = list(s)
-    for index_s,seq in enumerate(s):
-        #reversing internal items
-        if(len(seq)==1):
-            continue
-        else:
-            seq_l = list(seq)
-            seq_l.reverse()
-            seq_l = tuple(seq_l)
-            s[index_s] = seq_l
+    if isinstance(s, tuple):
+        for index_s,seq in enumerate(s):
+            #reversing internal items
+            if(len(seq)==1):
+                continue
+            else:
+                seq_l = list(seq)
+                seq_l.reverse()
+                seq_l = tuple(seq_l)
+                s[index_s] = seq_l
     s.reverse()
     return s
 
@@ -223,11 +224,11 @@ def mscandidate_gen_SPM(Fk_1, mis):
                         if Length(s1) == 2 and Size(s1) == 2 and s2_last_item > s1_last_item:
                             c2 = list(s1)
                             c2.append(flatten_subsequence(s2[-1]))
-                            Ck.add(c2)
+                            Ck.add(tuple(c2))
                         elif (Length(s1) == 2 and Size(s1) == 1 and s2_last_item > s1_last_item) or (Length(s1)>2):
                             c2 = list(s1)
                             c2.append(flatten_subsequence(s2[-1]))
-                            Ck.add(c2)
+                            Ck.add(tuple(c2))
                         Ck.add(c1)
                     
             # condition 2: if the MIS value of the last item in a sequence (denoted by s2) is < the MIS value of every other item in s2
@@ -236,6 +237,8 @@ def mscandidate_gen_SPM(Fk_1, mis):
                 s2 = reverse(s2)
                 t1 = list(s1)
                 t1.pop(1)
+                s1_first_mis = mis[flatten_subsequence(s1)[0]] if isinstance(s1[0], tuple) else mis[s1[0]]
+                s2_last_mis = mis[flatten_subsequence(s2)[-1]] if isinstance(s2[-1], tuple) else mis[s2[-1]]
                 if(t1 == list(s2)[:-1] and s2_last_mis>s1_first_mis):
                     if isinstance(s2[-1], tuple):
                         c1 = list(s1)
@@ -244,13 +247,16 @@ def mscandidate_gen_SPM(Fk_1, mis):
                         s2_last_item = flatten_subsequence(s2[-1:]) if isinstance(s2[-1:], tuple) else s2[-1:]
                         if Length(s1) == 2 and Size(s1) == 2 and s2_last_item > s1_last_item:
                             c2 = list(s1)
-                            c2.append(flatten_subsequence(s2[-1]))
+                            c2.append(tuple(flatten_subsequence(s2[-1])))
+                            c2 = tuple(c2)
                             Ck.add(c2)
                         elif (Length(s1) == 2 and Size(s1) == 1 and s2_last_item > s1_last_item) or (Length(s1)>2):
                             c2 = list(s1)
                             c2.append(flatten_subsequence(s2[-1]))
+                            c2 = tuple(c2)
                             Ck.add(c2)
-                        Ck.add(c1)
+                        c1 = tuple(c1)
+                        Ck.add(tuple(c1))
                 # t2 = list(s2)
                 # t2.pop(1)
                 # if t2 == list(s1)[:-1] and s1_first_mis>s2_last_mis:
