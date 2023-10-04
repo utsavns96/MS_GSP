@@ -37,13 +37,13 @@ def level2_candidate_gen_SPM(L, phi, mis, num_sequences):
         else:
             mis_l = mis[rest]
         if L[l] / num_sequences >= mis_l:
-            for h in keys[index + 1:]:  # "for each item h in L that is after l, do:"
+            for h in keys[index:]:  # "for each item h in L that is after l, do:"
                 if L[h] / num_sequences >= mis_l and abs(L[h] / num_sequences - L[l] / num_sequences) <= phi:
                     # join step: merge sequences containing l and h
-                    if l <= h:
+                    if l < h:
                         new_sequence = [l, h]
                         C2.add(tuple(new_sequence))
-                    else:
+                    elif h > l:
                         new_sequence = [h, l]
                         C2.add(tuple(new_sequence))
                     C2.add(((l,), (h,)))
@@ -65,7 +65,7 @@ def join_step(s1, s2):
     new_tup = ()
     # if the subsequence obtained by dropping the first item of s1
     # is the same as the subsequence obtained by dropping the last item of s2,
-    if flatten_subsequence(s1[1:]) == flatten_subsequence(s2[:-1]):
+    if flatten_subsequence(s1)[1:] == flatten_subsequence(s2)[:-1]:
         # the candidate sequence is the sequence s1 extended with the last item in s2
         if isinstance(s2[-1], tuple):
             #new_sequence = list(s1)

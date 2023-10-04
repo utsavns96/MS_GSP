@@ -374,6 +374,11 @@ if __name__ == "__main__":
     print("\n************\n")
     F = GSP(data,m, mis, sdc)
     print(F)
+    # test_set = set()
+    # test_set.add(((20,30),(30,)))
+    # test_set.add(((30,),(30,70)))
+
+    # Ck = mscandidate_gen_SPM(test_set, mis)
     # print(is_contained((10,40), [[10, 40, 50], [40, 90]])) # True
     # print(is_contained(((10, 50),), [[10, 40, 50], [40, 90]])) # False
     # print(is_contained(((10,), (50,)), [[10, 40, 50], [40, 90]])) # False
