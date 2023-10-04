@@ -66,7 +66,7 @@ def join_step(s1, s2):
     # is the same as the subsequence obtained by dropping the last item of s2,
     if flatten_subsequence(s1)[1:] == flatten_subsequence(s2)[:-1]:
         # the candidate sequence is the sequence s1 extended with the last item in s2
-        if isinstance(s2[-1], tuple):
+        if isinstance(s2[-1], tuple) and Length(s2[-1]) == 1:
             #new_sequence = list(s1)
             #new_sequence.append(s2[-1])
             #new_tup = tuple(new_sequence)
@@ -78,6 +78,14 @@ def join_step(s1, s2):
                 new_tup = tuple([s1,s2[-1]])
                 #new_tup=(tuple(list(s1)),s2[-1])
             #Ck.add(tuple(new_sequence))
+        elif isinstance(s2[-1], tuple) and Size(s1) > 1:
+            new_seq = list(s1[-1])
+            new_item = s2[-1][-1]
+            new_seq.append(new_item)
+            new_seq = tuple(new_seq)
+            new_tup = (list(s1[:1]))
+            new_tup.append(new_seq)
+            new_tup = tuple(new_tup)
         else:
             if isinstance(s1[-1], tuple):
                 new_sequence = s1[-1] + (s2[-1], )
@@ -85,7 +93,10 @@ def join_step(s1, s2):
                 #Ck.add(new_tup)
             else: # it's an integer,
                 new_sequence = list(s1)
-                new_sequence.append(s2[-1])
+                if isinstance(s2[-1], int):
+                    new_sequence.append(s2[-1])
+                else:
+                    new_sequence.append(s2[-1][-1])
                 new_tup = tuple(new_sequence)
                 #Ck.add(new_tup)
         # if new_tup == ():
@@ -93,7 +104,10 @@ def join_step(s1, s2):
     return new_tup
 
 def Size(s):
-    return len(s)
+    if isinstance(s[0], int):
+        return 1
+    else:
+        return len(s)
 
 def Length(s):
     return len(flatten_subsequence(s))
