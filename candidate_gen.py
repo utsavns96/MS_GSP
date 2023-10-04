@@ -56,11 +56,13 @@ def level2_candidate_gen_SPM(L, phi, mis, num_sequences):
 
 
 def flatten_subsequence(t):
+    l = []
     for i in t:
         if isinstance(i, tuple):
-            return flatten_subsequence(i)
+            l = l + flatten_subsequence(i)
         else:
-            return i
+            l.append(i)
+    return l
 
 
 def join_step(s1, s2):
@@ -114,19 +116,19 @@ def mscandidate_gen_SPM(Fk_1, mis):
     # Fk_test.add((30, 80))
     # Ck = join_step(Fk_test)
     for s1 in Fk_1:
-        s1_first_mis = mis[flatten_subsequence(s1[0])] if isinstance(s1[0], tuple) else mis[s1[0]]
-        s1_first_smallest = False
+        s1_first_mis = mis[flatten_subsequence(s1)[0]] if isinstance(s1[0], tuple) else mis[s1[0]]
+        s1_first_smallest = None
         # check for condition 1
         for index,i in enumerate(s1[1:]):
-            mis_i = mis[flatten_subsequence(s1[0])] if isinstance(i, tuple) else mis[i]
+            mis_i = mis[flatten_subsequence(s1)[0]] if isinstance(i, tuple) else mis[i]
             if index < len(s1[1:]) -1 and mis_i<s1_first_mis:
                 s1_first_smallest = False
             elif index == len(s1[1:]) -1 and mis_i<s1_first_mis:
                 s1_first_smallest = True
 
         for s2 in Fk_1:
-            s2_last_smallest = False
-            s2_last_mis = mis[flatten_subsequence(s2[-1:])] if isinstance(s2[-1:], tuple) else mis[s2[-1:]]
+            s2_last_smallest = None
+            s2_last_mis = mis[flatten_subsequence(s2)[-1]] if isinstance(s2[-1:], tuple) else mis[s2[-1:]]
             
             # check for condition 2
             if (not s1_first_smallest):
