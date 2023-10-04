@@ -195,6 +195,13 @@ def is_orderedsubset(s1, s2):
     return True
 
 
+def sumtaken(taken):
+    count = 0
+    for i in taken:
+        if i == 1:
+            count += 1
+    return count
+
 def is_contained(c, s):
     taken = []
     for subseq in s:
@@ -207,12 +214,13 @@ def is_contained(c, s):
        for item in c:
             for idx, subseq in enumerate(s):
                 if is_orderedsubset(item, subseq):
-                    if taken[idx] == 1:
+                    if taken[idx] == 1 and sumtaken(taken) == len(c):
                         return False
-                    taken[idx] = 1
-    for i in taken:
-        if i == 1:
-            return True
+                    elif taken[idx] != 1:
+                        taken[idx] = 1
+                        break
+    if sumtaken(taken) == len(c):
+        return True
     return False
 
 def minMIS(c,mis):
@@ -351,3 +359,7 @@ if __name__ == "__main__":
     # print(is_contained(((10, 50),), [[10, 40, 50], [40, 90]])) # False
     # print(is_contained(((10,), (50,)), [[10, 40, 50], [40, 90]])) # False
     # print(is_contained((50,10), [[10, 40, 50], [40, 90]])) # False
+    # #
+    # print(is_contained(((80,), (70,)), [[20, 30], [70, 80], [20, 30, 70]])) # True
+    # print(is_contained(((30,), (70,)), [[20, 30, 70, 80],[50, 70]])) # True
+    # print(is_contained(((30,), (70,)), [[20, 30],[70, 80],[20, 30, 70]]))  # True
