@@ -210,12 +210,12 @@ def mscandidate_gen_SPM(Fk_1, mis):
                         if Length(s1) == 2 and Size(s1) == 2 and s2_last_item > s1_last_item:
                             c2 = list(s1)
                             c2.append(flatten_subsequence(s2[-1]))
-                            Ck.add(c2)
+                            Ck.add(tuple(c2))
                         elif (Length(s1) == 2 and Size(s1) == 1 and s2_last_item > s1_last_item) or (Length(s1)>2):
                             c2 = list(s1)
                             c2.append(flatten_subsequence(s2[-1]))
-                            Ck.add(c2)
-                        Ck.add(c1)
+                            Ck.add(tuple(c2))
+                        Ck.add(tuple(c1))
                     
             # condition 2: if the MIS value of the last item in a sequence (denoted by s2) is < the MIS value of every other item in s2
             elif (s2_last_smallest):
@@ -230,12 +230,12 @@ def mscandidate_gen_SPM(Fk_1, mis):
                         if Length(s2) == 2 and Size(s2) == 2 and s1_last_item > s2_last_item:
                             c1 = list(s2)
                             c1.append(flatten_subsequence(s1[-1]))
-                            Ck.add(c1)
+                            Ck.add(tuple(c1))
                         elif Length(s2) == 2 and Size(s2) == 1 and s1_last_item > s2_last_item or Length(s2) > 2:
                             c1 = list(s2)
                             c1.append(flatten_subsequence(s1[-1]))
-                            Ck.add(c1)
-                        Ck.add(c2)
+                            Ck.add(tuple(c1))
+                        Ck.add(tuple(c2))
 
             # condtition 3: default case
             else:
