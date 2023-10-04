@@ -158,21 +158,76 @@ def filter(L, mis, num_sequences):
     return ret
 
 
+# def is_contained(c, s):
+#     for subset in s:
+#         contains_all = True
+#         for item in c:
+#             if isinstance(item, tuple):
+#                 for i in item:
+#                     if i not in subset:
+#                         contains_all = False
+#                         break
+#             else:
+#                 if item not in subset:
+#                     contains_all = False
+#                     break
+#         if contains_all:
+#             return True
+#     return False
+
+def is_orderedsubset(s1, s2):
+    first_index = -1
+    for idx, item in enumerate(s2):
+        if item == s1[0]:
+            first_index = idx
+            break
+    if first_index == -1:
+        return False
+
+    idx_2 = first_index
+
+    for idx, item in enumerate(s1):
+        if idx_2 >= len(s2):
+            return False
+        if item == s2[idx_2]:
+            idx_2 += 1
+        else:
+            return False
+    return True
+
+def is_subset(subset, main_list):
+    return all(item in main_list for item in subset)
+
+def sumtaken(taken):
+    count = 0
+    for i in taken:
+        if i == 1:
+            count += 1
+    return count
+
 def is_contained(c, s):
-    for subset in s:
-        contains_all = True
-        for item in c:
-            if isinstance(item, tuple):
-                for i in item:
-                    if i not in subset:
-                        contains_all = False
+    c_taken = []
+    taken = []
+    for subseq in s:
+        taken.append(0)
+    for subseq in c:
+        c_taken.append(0)
+    if not isinstance(c[0], tuple): # C is a 2-tuple of ints
+        for subseq in s:
+            if is_subset(c, subseq):
+                return True
+    else:
+       for i, item in enumerate(c):
+            for j, subseq in enumerate(s):
+                if is_subset(item, subseq):
+                    if taken[j] != 1:
+                        taken[j]= 1
+                        c_taken[i] = 1
                         break
-            else:
-                if item not in subset:
-                    contains_all = False
-                    break
-        if contains_all:
-            return True
+                else:
+                    taken[j] = 1
+    if sumtaken(c_taken) == len(c):
+        return True
     return False
 
 def minMIS(c,mis):
@@ -268,7 +323,7 @@ def GSP(S,m,mis, sdc):
         if k == 2:
             Ck = level2_candidate_gen_SPM(L, sdc, mis, len(L))
         else:
-            #break
+            # break
             Ck = mscandidate_gen_SPM(F[k-2], mis) # F[k-2] is Fk-1
         for s in S:
             for c in Ck:
@@ -288,6 +343,10 @@ def GSP(S,m,mis, sdc):
             if c in count_c and count_c[c]/len(S) >= minMIS(c, mis):
                 Fk.add(c)
         print_k_sequence(Fk, k, output)
+
+        # debug
+        # for c in Fk:
+        #     print("{} - count: {}".format(c, count_c[c]))
         F.append(Fk)
         k += 1 # k++
     return F
@@ -307,6 +366,18 @@ if __name__ == "__main__":
     F = GSP(data,m, mis, sdc)
     print(F)
     # print(is_contained((10,40), [[10, 40, 50], [40, 90]])) # True
-    # print(is_contained(((10, 50),), [[10, 40, 50], [40, 90]])) # True
+    # print(is_contained(((10, 50),), [[10, 40, 50], [40, 90]])) # False
     # print(is_contained(((10,), (50,)), [[10, 40, 50], [40, 90]])) # False
-    # print(is_contained(((50,10),),[[10, 470, 50], [40, 90]]))
+    # print(is_contained((50,10), [[10, 40, 50], [40, 90]])) # False
+    # #
+    # print(is_contained(((80,), (70,)), [[20, 30], [70, 80], [20, 30, 70]])) # True
+    # print(is_contained(((30,), (70,)), [[20, 30, 70, 80],[50, 70]])) # True
+    # print(is_contained(((30,), (70,)), [[20, 30],[70, 80],[20, 30, 70]]))  # True
+    # test = ((80,), (70,))
+    # print(test)
+    # for s in data:
+    #     print("{} - {}".format(s, is_contained(test, s)))
+    # print(is_contained(test, [[20, 30, 70, 80], [50, 70]]))
+    # print(is_contained(test, [[20, 30], [30, 70, 80]]))
+    # print(is_contained(test, [[70],[30]]))
+    # print(is_contained(test,[[20, 30], [70, 80], [20, 30, 70]]))
